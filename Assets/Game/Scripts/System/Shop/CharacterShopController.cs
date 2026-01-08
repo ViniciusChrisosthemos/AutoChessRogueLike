@@ -11,7 +11,7 @@ public class CharacterShopController : MonoBehaviour
 
     private List<CharacterSO> _characters = new List<CharacterSO>();
 
-    private void Start()
+    private void Awake()
     {
         characterPool = new CharacterPool();
         characterPool.InitPool(poolParameters, poolAmountsSO);

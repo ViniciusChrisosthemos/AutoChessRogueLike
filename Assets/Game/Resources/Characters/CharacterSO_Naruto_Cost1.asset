@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3b385eaaca319e4fa26a42cd66b767f, type: 3}
+  m_Name: CharacterSO_Naruto_Cost1
+  m_EditorClassIdentifier: 
+  CharacterName: Naruto
+  Cost: {fileID: 11400000, guid: e541aa1d93b1ad7478db74ad39d58384, type: 2}
+  Keywords:
+  - {fileID: 11400000, guid: 7e6e3b21d932df545b153482782a1fcc, type: 2}
+  - {fileID: 11400000, guid: cd19af1704e548d42ae64631cd30da56, type: 2}
+  - {fileID: 11400000, guid: 53adf2df02d12ec4ba7087fa9b596670, type: 2}
+  ShopArt: {fileID: 0}

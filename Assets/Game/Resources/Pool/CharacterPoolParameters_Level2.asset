@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a92c651b4fdec1340ab9c7f28b292c38, type: 3}
+  m_Name: CharacterPoolParameters_Level2
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterPool/CharacterPoolParameters
+  CharacterAmounts:
+  - Item: {fileID: 11400000, guid: e541aa1d93b1ad7478db74ad39d58384, type: 2}
+    Probability: 0.75
+  - Item: {fileID: 11400000, guid: 777fd5c68fcc0e641a35ffdfa4e3f302, type: 2}
+    Probability: 0.25

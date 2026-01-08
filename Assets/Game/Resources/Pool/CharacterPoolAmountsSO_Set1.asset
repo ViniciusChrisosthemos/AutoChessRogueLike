@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da79c3dafce290c4e8bf1ac828101f8b, type: 3}
+  m_Name: CharacterPoolAmountsSO_Set1
+  m_EditorClassIdentifier: 
+  Characters:
+  - Item: {fileID: 11400000, guid: 36e89bf6f1d853341b4762db366155f5, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: 311b6eda678baaa40b0f653e0d4526a2, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: 8ec869c7907a89e42bbfd077bf3295b1, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: fcfdbc737d3e2b34c8b185485193dc56, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: 413f3a1a857cb6f409e8f5a425d44986, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: c5f416f2c9d79b44b9a48ce429f714a1, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: 599bbdcdc6f524845a804ef43d90f70c, type: 2}
+    Amount: 99
+  - Item: {fileID: 11400000, guid: 11625145bf0560f40bb9d813a506ef3c, type: 2}
+    Amount: 99

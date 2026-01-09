@@ -5,4 +5,6 @@ public class KeywordSO : ScriptableObject
 {
     public string Name;
     public Sprite Art;
+
+    public AbstractBaseTrait Trait;
 }

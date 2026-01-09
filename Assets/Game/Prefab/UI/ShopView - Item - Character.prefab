@@ -34,8 +34,6 @@ RectTransform:
   - {fileID: 7829626592962096908}
   - {fileID: 3848376463731102479}
   - {fileID: 2241077493471425917}
-  - {fileID: 3706348997030681773}
-  - {fileID: 6655599289805312536}
   - {fileID: 889938489331017430}
   m_Father: {fileID: 437742367477512128}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -238,12 +236,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8273805618511245634}
+  m_Father: {fileID: 2241077493471425917}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 122.26001, y: 75.5}
-  m_SizeDelta: {x: -254.51999, y: -161}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2906096334034835084
 CanvasRenderer:
@@ -450,12 +448,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8273805618511245634}
+  m_Father: {fileID: 2241077493471425917}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 122.26001, y: 75.5}
-  m_SizeDelta: {x: -254.51999, y: -161}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6683659556757657273
 CanvasRenderer:
@@ -578,14 +576,16 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3706348997030681773}
+  - {fileID: 6655599289805312536}
   m_Father: {fileID: 8273805618511245634}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -5, y: -5}
   m_SizeDelta: {x: 35, y: 35}
-  m_Pivot: {x: 1, y: 1}
+  m_Pivot: {x: 1, y: 0}
 --- !u!1 &9005939483419465533
 GameObject:
   m_ObjectHideFlags: 0

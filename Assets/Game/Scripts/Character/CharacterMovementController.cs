@@ -80,9 +80,10 @@ public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, I
         }
     }
 
-    public void SetCharacter(BoardController boardController, CharacterSO characterSO, bool inBench)
+    public void SetCharacter(BoardController boardController, CharacterSO characterSO, bool inBench, Vector3 initialPosition)
     {
         _boardController = boardController;
+        _oldPosition = initialPosition;
 
         _characterRuntime = new CharacterRuntime(characterSO, inBench);
 

@@ -223,7 +223,7 @@ public class BoardController : MonoBehaviour
         characterController.transform.position = _benchPositions[benchPos.Item2][benchPos.Item1].Position;
         _benchPositions[benchPos.Item2][benchPos.Item1].Occuped = true;
 
-        characterController.SetCharacter(this, characterSO, true);
+        characterController.SetCharacter(this, characterSO, true, _benchPositions[benchPos.Item2][benchPos.Item1].Position);
 
         _characterControllers.Add(characterController);
 
@@ -296,6 +296,7 @@ public class BoardController : MonoBehaviour
         _characterControllers.Remove(characterMovementController);
         Destroy(characterMovementController.gameObject);
     }
+
 
     public class ReferencePosition
     {

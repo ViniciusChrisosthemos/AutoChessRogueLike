@@ -10,6 +10,7 @@ public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private BoardController _boardController;
     [SerializeField] private CharacterShopController _characterShopController;
     [SerializeField] private UIListDisplay _characterListDisplay;
+    [SerializeField] private UIListDisplay _characterProbabilitiesListDisplay;
     [SerializeField] private Button _btnRefreshShop;
     [SerializeField] private GameObject _toDeleteView;
 
@@ -19,6 +20,8 @@ public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointer
         RefreshShop();
 
         GameStateController.Instance.OnDeleteCharacterRequest.AddListener(HandleDeleteCharacterRequest);
+
+        _characterProbabilitiesListDisplay.SetItems(_characterShopController.GetProbabilities(), null);
     }
 
     private void Update()

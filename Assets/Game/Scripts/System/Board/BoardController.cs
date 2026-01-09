@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ public class BoardController : MonoBehaviour
     public Transform BoardParent;
     public Transform BenchParent;
 
-    private List<CharacterRuntime> _boardCharacters;
+    private List<CharacterMovementController> _characterControllers;
     private ReferencePosition[][] _boardPositions;
     private ReferencePosition[][] _benchPositions;
 
@@ -23,6 +24,8 @@ public class BoardController : MonoBehaviour
     {
         var rows = BoardConfiguration.BoardRows;
         var columns = BoardConfiguration.BoardColumns;
+
+        _characterControllers = new List<CharacterMovementController>();
 
         InitBoard(rows, columns);
     }
@@ -111,7 +114,7 @@ public class BoardController : MonoBehaviour
         var x = Mathf.FloorToInt(columns * ((position.x - parent.position.x) / width));
         var y = Mathf.FloorToInt(rows * ((position.z - parent.position.z) / height));
 
-        Debug.Log($"{rows} {columns} {width} {height} {x} {y}  {position}");
+        //Debug.Log($"{rows} {columns}  {width} {height}  {x} {y}   {position}   {parent.position}    {columns * ((position.x - parent.position.x) / width)} {rows * ((position.z - parent.position.z) / height)}");
 
         if (x < 0 || y < 0 || x >= columns || y >= rows)
         {
@@ -131,33 +134,34 @@ public class BoardController : MonoBehaviour
         return GetPosition(position, _boardPositions, BoardParent);
     }
 
-    public void MoveCharacter(CharacterMovementController characterController, Vector3 oldPosition, Vector3 newPosition)
+    public void MoveCharacter(CharacterMovementController characterController, Vector3 newPosition)
     {
-        var newBoardPos = GetBoardPosition(newPosition);
+        Debug.Log($"{characterController.CharacterRuntime.InBench}  {newPosition}");
 
-        Debug.Log($"newBoardPos {newBoardPos}");
+        var newBoardPos = GetBoardPosition(newPosition);
 
         if (newBoardPos != (-1, -1))
         {
+            Debug.Log($"New Board Pos   {newBoardPos}");
             if (!_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped)
             {
                 characterController.transform.position = _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position;
                 _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped = true;
 
-                ClearOldPosition(characterController, oldPosition);
+                ClearOldPosition(characterController, characterController.OldPosition);
 
                 characterController.CharacterRuntime.InBench = false;
             }
             else
             {
-                characterController.transform.position = oldPosition;
+                characterController.transform.position = characterController.OldPosition;
             }
         }
         else
         {
             var newBenchPos = GetBenchPosition(newPosition);
 
-            Debug.Log($"newBenchPos {newBoardPos}");
+            Debug.Log($"New Bench Pos   {newBenchPos}");
 
             if (newBenchPos != (-1, -1))
             {
@@ -166,35 +170,47 @@ public class BoardController : MonoBehaviour
                     characterController.transform.position = _benchPositions[newBenchPos.Item2][newBenchPos.Item1].Position;
                     _benchPositions[newBenchPos.Item2][newBenchPos.Item1].Occuped = true;
 
-                    ClearOldPosition(characterController, oldPosition);
+                    ClearOldPosition(characterController, characterController.OldPosition);
 
                     characterController.CharacterRuntime.InBench = true;
                 }
                 else
                 {
-                    characterController.transform.position = oldPosition;
+                    characterController.transform.position = characterController.OldPosition;
                 }
             }
             else
             {
-                characterController.transform.position = oldPosition;
+                characterController.transform.position = characterController.OldPosition;
             }
         }
     }
 
     private void ClearOldPosition(CharacterMovementController characterController, Vector3 oldPosition)
     {
+        Debug.Log($"==>   {oldPosition}");
+
         if (characterController.CharacterRuntime.InBench)
         {
             var oldBenchPos = GetBenchPosition(oldPosition);
 
+            Debug.Log(oldBenchPos);
+
             _benchPositions[oldBenchPos.Item2][oldBenchPos.Item1].Occuped = false;
+
+
+            Debug.Log($"       {BenchParent.position}");
         }
         else
         {
             var oldBoardPos = GetBoardPosition(oldPosition);
 
+            Debug.Log(oldBoardPos);
+
             _boardPositions[oldBoardPos.Item2][oldBoardPos.Item1].Occuped = false;
+
+
+            Debug.Log($"       {BoardParent.position}");
         }
     }
 
@@ -202,12 +218,50 @@ public class BoardController : MonoBehaviour
     {
         var characterController = Instantiate(CharacterControllerPrefab, CharacterParent);
 
-        characterController.SetCharacter(this, characterSO, true);
-
         var benchPos = GetAvailableBenchPosition();
 
         characterController.transform.position = _benchPositions[benchPos.Item2][benchPos.Item1].Position;
         _benchPositions[benchPos.Item2][benchPos.Item1].Occuped = true;
+
+        characterController.SetCharacter(this, characterSO, true);
+
+        _characterControllers.Add(characterController);
+
+        CheckCharacterCopies(characterSO);
+    }
+
+    private void CheckCharacterCopies(CharacterSO characterSO)
+    {
+        var copiesControllers = _characterControllers.FindAll(c => c.CharacterRuntime.CharacterData == characterSO);
+
+        var starsGroup = copiesControllers.GroupBy(c => c.CharacterRuntime.Stars).OrderBy(item => item.Key);
+
+        bool hasUpgraded = false;
+
+        foreach (var group in starsGroup)
+        {
+            if (group.Count() >= 3)
+            {
+                var characters = group.Where(item => item.CharacterRuntime.InBench).ToList();
+                characters.AddRange(group.Where(item => !item.CharacterRuntime.InBench).ToList());
+
+                var charactersToDelete = characters.Take(2).ToList();
+                var characterToUpgrade = characters.Last();
+
+                charactersToDelete.ForEach(c => DeleteCharacter(c));
+
+                characterToUpgrade.CharacterRuntime.LevelUp();
+
+                hasUpgraded = true;
+
+                break;
+            }
+        }
+
+        if (hasUpgraded)
+        {
+            CheckCharacterCopies(characterSO);
+        }
     }
 
     public bool IsBenchFull()
@@ -234,6 +288,13 @@ public class BoardController : MonoBehaviour
         }
 
         return (-1, -1);
+    }
+
+    public void DeleteCharacter(CharacterMovementController characterMovementController)
+    {
+        ClearOldPosition(characterMovementController, characterMovementController.OldPosition);
+        _characterControllers.Remove(characterMovementController);
+        Destroy(characterMovementController.gameObject);
     }
 
     public class ReferencePosition

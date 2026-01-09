@@ -5,13 +5,19 @@ using UnityEngine.InputSystem;
 
 public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    public BoardController BoardController;
-    public CharacterSO CharacterSO;
-    public MeshRenderer MeshRenderer;
+    [SerializeField] private MeshRenderer _meshRenderer;
+
+    [Header("UI")]
+    [SerializeField] private GameObject _1starView;
+    [SerializeField] private GameObject _2starView;
+    [SerializeField] private GameObject _3starView;
 
     private bool _isDragging = false;
     private Vector3 _oldPosition;
     private CharacterRuntime _characterRuntime;
+    private BoardController _boardController;
+
+    private bool _hasSendDeleteRequest = false;
 
     private void Update()
     {
@@ -29,6 +35,25 @@ public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, I
 
                 transform.position = position;
             }
+
+            if (GameStateController.Instance.IsMouseInShopArea)
+            {
+                if (!_hasSendDeleteRequest)
+                {
+                    GameStateController.Instance.TriggerCharacterToDeleteRequest();
+
+                    _hasSendDeleteRequest = true;
+                }
+            }
+            else
+            {
+                if (_hasSendDeleteRequest)
+                {
+                    GameStateController.Instance.TriggerCharacterToDeleteCancel();
+
+                    _hasSendDeleteRequest = false;
+                }
+            }
         }
     }
 
@@ -43,18 +68,38 @@ public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, I
     {
         _isDragging = false;
 
-        BoardController.MoveCharacter(this, _oldPosition, transform.position);
+        if (GameStateController.Instance.IsMouseInShopArea)
+        {
+            _boardController.DeleteCharacter(this);
+
+            GameStateController.Instance.TriggerCharacterToDeleteCancel();
+        }
+        else
+        {
+            _boardController.MoveCharacter(this, transform.position);
+        }
     }
 
     public void SetCharacter(BoardController boardController, CharacterSO characterSO, bool inBench)
     {
-        BoardController = boardController;
+        _boardController = boardController;
 
-        _characterRuntime = new CharacterRuntime(CharacterSO, inBench);
+        _characterRuntime = new CharacterRuntime(characterSO, inBench);
 
-        //MeshRenderer.material.color = CharacterSO.Color;
-        Debug.Log($"=> {MeshRenderer}");
+        _meshRenderer.materials[0].color = _characterRuntime.CharacterData.Color;
+
+        _characterRuntime.OnLevelUp.AddListener(UpdateStars);
+
+        UpdateStars();
+    }
+
+    public void UpdateStars()
+    {
+        _1starView.SetActive(_characterRuntime.Stars == 1);
+        _2starView.SetActive(_characterRuntime.Stars == 2);
+        _3starView.SetActive(_characterRuntime.Stars == 3);
     }
 
     public CharacterRuntime CharacterRuntime => _characterRuntime;
+    public Vector3 OldPosition => _oldPosition;
 }

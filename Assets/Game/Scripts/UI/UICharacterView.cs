@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -6,14 +7,12 @@ using UnityEngine.UI;
 
 public class UICharacterView : UIItemController
 {
+    [SerializeField] private GameObject _view;
+    [SerializeField] private Button _btnButton;
     [SerializeField] private Image _imgCharacter;
     [SerializeField] private UIListDisplay _keywordsListDisplay;
     [SerializeField] private TextMeshProUGUI _txtCost;
     [SerializeField] private TextMeshProUGUI _txtName;
-
-    public void SetCharacter()
-    {
-    }
 
     protected override void HandleInit(object obj)
     {
@@ -25,5 +24,14 @@ public class UICharacterView : UIItemController
 
         _txtName.text = characterSO.CharacterName;
         _txtCost.text = characterSO.Cost.Cost.ToString();
+
+        _btnButton.onClick.AddListener(() => SelectItem());
+
+        _view.SetActive(true);
+    }
+
+    public void Hiden()
+    {
+        _view.SetActive(false);
     }
 }

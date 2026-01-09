@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class UICharacterShopView : MonoBehaviour
 {
+    [SerializeField] private BoardController _boardController;
     [SerializeField] private CharacterShopController _characterShopController;
 
     [SerializeField] private UIListDisplay _characterListDisplay;
@@ -28,7 +29,7 @@ public class UICharacterShopView : MonoBehaviour
 
     public void UpdateCharacters(List<CharacterSO> characters)
     {
-        _characterListDisplay.SetItems(characters, null);
+        _characterListDisplay.SetItems(characters, HandleCharacterSelected);
     }
 
     public void RefreshShop()
@@ -36,5 +37,18 @@ public class UICharacterShopView : MonoBehaviour
         var characters = _characterShopController.RefreshShop();
 
         UpdateCharacters(characters);
+    }
+
+    private void HandleCharacterSelected(UIItemController controller)
+    {
+        if (!_boardController.IsBenchFull())
+        {
+            var characterSO = controller.GetItem<CharacterSO>();
+
+            _boardController.CreateCharacter(characterSO);
+
+            var characterViewController = controller as UICharacterView;
+            characterViewController.Hiden();
+        }
     }
 }

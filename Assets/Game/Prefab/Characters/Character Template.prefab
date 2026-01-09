@@ -153,3 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 413abcdbdd63c5642aeb29787bdbca7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BoardController: {fileID: 0}
+  CharacterSO: {fileID: 0}
+  MeshRenderer: {fileID: 3578094796124011755}

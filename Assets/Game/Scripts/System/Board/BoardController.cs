@@ -1,5 +1,7 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BoardController : MonoBehaviour
@@ -9,10 +11,13 @@ public class BoardController : MonoBehaviour
     public Transform BenchParent;
 
     private List<CharacterRuntime> _boardCharacters;
-    private bool[][] _boardPositions;
-    private bool[][] _benchPositions;
+    private ReferencePosition[][] _boardPositions;
+    private ReferencePosition[][] _benchPositions;
 
     public GameObject CellPrefab;
+
+    public Transform CharacterParent;
+    public CharacterMovementController CharacterControllerPrefab;
 
     private void Start()
     {
@@ -24,15 +29,11 @@ public class BoardController : MonoBehaviour
 
     private void InitBoard(int rows, int colums)
     {
-        _boardPositions = new bool[rows][];
+        _boardPositions = new ReferencePosition[rows][];
 
         for (int i = 0; i < rows; i++)
         {
-            _boardPositions[i] = new bool[colums];
-            for (int j = 0; j < colums; j++)
-            {
-                _boardPositions[i][j] = false;
-            }
+            _boardPositions[i] = new ReferencePosition[colums];
         }
 
         var offset = new Vector3(
@@ -55,21 +56,21 @@ public class BoardController : MonoBehaviour
                     BoardParent);
 
                 cell.name = $"Board-Cell_{x}_{y}";
+
+                _boardPositions[y][x] = new ReferencePosition(cell.transform.position, false);
             }
         }
 
         var benchRows = BoardConfiguration.BenchRows;
         var benchColumns = BoardConfiguration.BenchColumns;
 
-        _benchPositions = new bool[benchRows][];
+        _benchPositions = new ReferencePosition[benchRows][];
 
         for (int y = 0; y < benchRows; y++)
         {
-            _benchPositions[y] = new bool[benchColumns];
+            _benchPositions[y] = new ReferencePosition[benchColumns];
             for (int x = 0; x < benchColumns; x++)
             {
-                _benchPositions[y][x] = false;
-
                 var cell = CreateCell(x, y,
                     BoardConfiguration.CellSpacingX,
                     BoardConfiguration.CellSpacingY,
@@ -80,6 +81,8 @@ public class BoardController : MonoBehaviour
                     BenchParent);
 
                 cell.name = $"Bench-Cell_{x}_{y}";
+
+                _benchPositions[y][x] = new ReferencePosition(cell.transform.position, false);
             }
         }
     }
@@ -97,7 +100,7 @@ public class BoardController : MonoBehaviour
         return cell;
     }
     
-    public (int, int) GetPosition(Transform obj, bool[][] grid, Transform parent)
+    public (int, int) GetPosition(Vector3 position, ReferencePosition[][] grid, Transform parent)
     {
         var rows = grid.Length;
         var columns = grid[0].Length;
@@ -105,10 +108,12 @@ public class BoardController : MonoBehaviour
         var width = (BoardConfiguration.CellSizeX * columns + BoardConfiguration.CellSpacingX * (columns - 1));
         var height = (BoardConfiguration.CellSizeZ * rows + BoardConfiguration.CellSpacingY * (rows - 1));
 
-        var x = Mathf.FloorToInt(columns * (obj.position.x - parent.position.x));
-        var y = Mathf.FloorToInt(rows * (obj.position.z - parent.position.z));
+        var x = Mathf.FloorToInt(columns * ((position.x - parent.position.x) / width));
+        var y = Mathf.FloorToInt(rows * ((position.z - parent.position.z) / height));
 
-        if (x < 0 || y < 0 || x > width || y > height)
+        Debug.Log($"{rows} {columns} {width} {height} {x} {y}  {position}");
+
+        if (x < 0 || y < 0 || x >= columns || y >= rows)
         {
             return (-1, -1);
         }
@@ -116,13 +121,130 @@ public class BoardController : MonoBehaviour
         return (x, y);
     }
 
-    public (int, int) GetBenchPosition(Transform obj)
+    public (int, int) GetBenchPosition(Vector3 position)
     {
-        return GetPosition(obj, _benchPositions, BenchParent);
+        return GetPosition(position, _benchPositions, BenchParent);
     }
 
-    public (int, int) GetBoardPosition(Transform obj)
+    public (int, int) GetBoardPosition(Vector3 position)
     {
-        return GetPosition(obj, _boardPositions, BoardParent);
+        return GetPosition(position, _boardPositions, BoardParent);
+    }
+
+    public void MoveCharacter(CharacterMovementController characterController, Vector3 oldPosition, Vector3 newPosition)
+    {
+        var newBoardPos = GetBoardPosition(newPosition);
+
+        Debug.Log($"newBoardPos {newBoardPos}");
+
+        if (newBoardPos != (-1, -1))
+        {
+            if (!_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped)
+            {
+                characterController.transform.position = _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position;
+                _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped = true;
+
+                ClearOldPosition(characterController, oldPosition);
+
+                characterController.CharacterRuntime.InBench = false;
+            }
+            else
+            {
+                characterController.transform.position = oldPosition;
+            }
+        }
+        else
+        {
+            var newBenchPos = GetBenchPosition(newPosition);
+
+            Debug.Log($"newBenchPos {newBoardPos}");
+
+            if (newBenchPos != (-1, -1))
+            {
+                if (!_benchPositions[newBenchPos.Item2][newBenchPos.Item1].Occuped)
+                {
+                    characterController.transform.position = _benchPositions[newBenchPos.Item2][newBenchPos.Item1].Position;
+                    _benchPositions[newBenchPos.Item2][newBenchPos.Item1].Occuped = true;
+
+                    ClearOldPosition(characterController, oldPosition);
+
+                    characterController.CharacterRuntime.InBench = true;
+                }
+                else
+                {
+                    characterController.transform.position = oldPosition;
+                }
+            }
+            else
+            {
+                characterController.transform.position = oldPosition;
+            }
+        }
+    }
+
+    private void ClearOldPosition(CharacterMovementController characterController, Vector3 oldPosition)
+    {
+        if (characterController.CharacterRuntime.InBench)
+        {
+            var oldBenchPos = GetBenchPosition(oldPosition);
+
+            _benchPositions[oldBenchPos.Item2][oldBenchPos.Item1].Occuped = false;
+        }
+        else
+        {
+            var oldBoardPos = GetBoardPosition(oldPosition);
+
+            _boardPositions[oldBoardPos.Item2][oldBoardPos.Item1].Occuped = false;
+        }
+    }
+
+    public void CreateCharacter(CharacterSO characterSO)
+    {
+        var characterController = Instantiate(CharacterControllerPrefab, CharacterParent);
+
+        characterController.SetCharacter(this, characterSO, true);
+
+        var benchPos = GetAvailableBenchPosition();
+
+        characterController.transform.position = _benchPositions[benchPos.Item2][benchPos.Item1].Position;
+        _benchPositions[benchPos.Item2][benchPos.Item1].Occuped = true;
+    }
+
+    public bool IsBenchFull()
+    {
+        for (int i = 0; i < _benchPositions.Length; i++)
+        {
+            for (int j = 0; j < _benchPositions[0].Length; j++)
+            {
+                if (!_benchPositions[i][j].Occuped) return false;
+            }
+        }
+
+        return true;
+    }
+
+    public (int, int) GetAvailableBenchPosition()
+    {
+        for (int i = 0; i < _benchPositions.Length; i++)
+        {
+            for (int j = 0; j < _benchPositions[0].Length; j++)
+            {
+                if (!_benchPositions[i][j].Occuped) return (j, i);
+            }
+        }
+
+        return (-1, -1);
+    }
+
+    public class ReferencePosition
+    {
+        public Vector3 Position;
+        public bool Occuped;
+
+        public ReferencePosition(Vector3 position, bool occuped)
+        {
+            Position = position;
+            Occuped = occuped;
+        }
     }
 }

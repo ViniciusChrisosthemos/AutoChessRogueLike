@@ -17,4 +17,5 @@ MonoBehaviour:
   Keywords:
   - {fileID: 11400000, guid: 7e6e3b21d932df545b153482782a1fcc, type: 2}
   - {fileID: 11400000, guid: 554ada9016dced34ca6c820642ee7e55, type: 2}
+  Color: {r: 0.16666651, g: 0, b: 1, a: 1}
   ShopArt: {fileID: 0}

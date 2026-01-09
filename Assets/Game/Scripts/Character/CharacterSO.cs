@@ -12,6 +12,7 @@ public class CharacterSO : ScriptableObject
     public string CharacterName;
     public CostSO Cost;
     public List<KeywordSO> Keywords;
+    public Color Color;
 
     // Art
     public Sprite ShopArt;

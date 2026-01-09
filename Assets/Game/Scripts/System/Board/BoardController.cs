@@ -114,7 +114,7 @@ public class BoardController : MonoBehaviour
         var x = Mathf.FloorToInt(columns * ((position.x - parent.position.x) / width));
         var y = Mathf.FloorToInt(rows * ((position.z - parent.position.z) / height));
 
-        //Debug.Log($"{rows} {columns}  {width} {height}  {x} {y}   {position}   {parent.position}    {columns * ((position.x - parent.position.x) / width)} {rows * ((position.z - parent.position.z) / height)}");
+        Debug.Log($"{rows} {columns}  {width} {height}  {x} {y}   {position}   {parent.position}    {columns * ((position.x - parent.position.x) / width)} {rows * ((position.z - parent.position.z) / height)}");
 
         if (x < 0 || y < 0 || x >= columns || y >= rows)
         {
@@ -145,16 +145,16 @@ public class BoardController : MonoBehaviour
             Debug.Log($"New Board Pos   {newBoardPos}");
             if (!_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped)
             {
-                characterController.transform.position = _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position;
                 _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped = true;
 
                 ClearOldPosition(characterController, characterController.OldPosition);
 
                 characterController.CharacterRuntime.InBench = false;
+                characterController.SetPosition(_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position);
             }
             else
             {
-                characterController.transform.position = characterController.OldPosition;
+                characterController.SetPosition(characterController.OldPosition);
             }
         }
         else
@@ -167,21 +167,21 @@ public class BoardController : MonoBehaviour
             {
                 if (!_benchPositions[newBenchPos.Item2][newBenchPos.Item1].Occuped)
                 {
-                    characterController.transform.position = _benchPositions[newBenchPos.Item2][newBenchPos.Item1].Position;
                     _benchPositions[newBenchPos.Item2][newBenchPos.Item1].Occuped = true;
 
                     ClearOldPosition(characterController, characterController.OldPosition);
 
                     characterController.CharacterRuntime.InBench = true;
+                    characterController.SetPosition(_benchPositions[newBenchPos.Item2][newBenchPos.Item1].Position);
                 }
                 else
                 {
-                    characterController.transform.position = characterController.OldPosition;
+                    characterController.SetPosition(characterController.OldPosition);
                 }
             }
             else
             {
-                characterController.transform.position = characterController.OldPosition;
+                characterController.SetPosition(characterController.OldPosition);
             }
         }
     }
@@ -194,23 +194,17 @@ public class BoardController : MonoBehaviour
         {
             var oldBenchPos = GetBenchPosition(oldPosition);
 
-            Debug.Log(oldBenchPos);
+            Debug.Log($"    BenchPos   {oldBenchPos}    {BenchParent.position}");
 
             _benchPositions[oldBenchPos.Item2][oldBenchPos.Item1].Occuped = false;
-
-
-            Debug.Log($"       {BenchParent.position}");
         }
         else
         {
             var oldBoardPos = GetBoardPosition(oldPosition);
 
-            Debug.Log(oldBoardPos);
+            Debug.Log($"    BoardPos   {oldBoardPos}    {BoardParent.position}  {characterController.transform.position} {characterController.OldPosition}");
 
             _boardPositions[oldBoardPos.Item2][oldBoardPos.Item1].Occuped = false;
-
-
-            Debug.Log($"       {BoardParent.position}");
         }
     }
 

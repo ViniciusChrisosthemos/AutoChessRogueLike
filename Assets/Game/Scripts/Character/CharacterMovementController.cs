@@ -101,6 +101,12 @@ public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, I
         _3starView.SetActive(_characterRuntime.Stars == 3);
     }
 
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position;
+        _oldPosition = position;
+    }
+
     public CharacterRuntime CharacterRuntime => _characterRuntime;
     public Vector3 OldPosition => _oldPosition;
 }

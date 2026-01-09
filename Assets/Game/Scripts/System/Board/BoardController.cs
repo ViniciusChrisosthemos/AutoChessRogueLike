@@ -1,9 +1,7 @@
-using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BoardController : MonoBehaviour
 {
@@ -19,6 +17,8 @@ public class BoardController : MonoBehaviour
 
     public Transform CharacterParent;
     public CharacterMovementController CharacterControllerPrefab;
+
+    public UnityEvent<List<CharacterSO>> OnCharacterChangeInBoard;
 
     private void Start()
     {
@@ -136,21 +136,27 @@ public class BoardController : MonoBehaviour
 
     public void MoveCharacter(CharacterMovementController characterController, Vector3 newPosition)
     {
-        Debug.Log($"{characterController.CharacterRuntime.InBench}  {newPosition}");
+        //Debug.Log($"{characterController.CharacterRuntime.InBench}  {newPosition}");
 
         var newBoardPos = GetBoardPosition(newPosition);
 
         if (newBoardPos != (-1, -1))
         {
-            Debug.Log($"New Board Pos   {newBoardPos}");
+            //Debug.Log($"New Board Pos   {newBoardPos}");
             if (!_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped)
             {
                 _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped = true;
 
                 ClearOldPosition(characterController, characterController.OldPosition);
 
-                characterController.CharacterRuntime.InBench = false;
                 characterController.SetPosition(_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position);
+
+                if (characterController.CharacterRuntime.InBench)
+                {
+                    TriggerBoardUpdate();
+                }
+
+                characterController.CharacterRuntime.InBench = false;
             }
             else
             {
@@ -161,7 +167,7 @@ public class BoardController : MonoBehaviour
         {
             var newBenchPos = GetBenchPosition(newPosition);
 
-            Debug.Log($"New Bench Pos   {newBenchPos}");
+            //Debug.Log($"New Bench Pos   {newBenchPos}");
 
             if (newBenchPos != (-1, -1))
             {
@@ -171,8 +177,15 @@ public class BoardController : MonoBehaviour
 
                     ClearOldPosition(characterController, characterController.OldPosition);
 
-                    characterController.CharacterRuntime.InBench = true;
                     characterController.SetPosition(_benchPositions[newBenchPos.Item2][newBenchPos.Item1].Position);
+
+                    if (!characterController.CharacterRuntime.InBench)
+                    {
+                        TriggerBoardUpdate();
+                    }
+
+                    characterController.CharacterRuntime.InBench = true;
+
                 }
                 else
                 {
@@ -188,13 +201,13 @@ public class BoardController : MonoBehaviour
 
     private void ClearOldPosition(CharacterMovementController characterController, Vector3 oldPosition)
     {
-        Debug.Log($"==>   {oldPosition}");
+        //Debug.Log($"==>   {oldPosition}");
 
         if (characterController.CharacterRuntime.InBench)
         {
             var oldBenchPos = GetBenchPosition(oldPosition);
 
-            Debug.Log($"    BenchPos   {oldBenchPos}    {BenchParent.position}");
+            //Debug.Log($"    BenchPos   {oldBenchPos}    {BenchParent.position}");
 
             _benchPositions[oldBenchPos.Item2][oldBenchPos.Item1].Occuped = false;
         }
@@ -202,7 +215,7 @@ public class BoardController : MonoBehaviour
         {
             var oldBoardPos = GetBoardPosition(oldPosition);
 
-            Debug.Log($"    BoardPos   {oldBoardPos}    {BoardParent.position}  {characterController.transform.position} {characterController.OldPosition}");
+            //Debug.Log($"    BoardPos   {oldBoardPos}    {BoardParent.position}  {characterController.transform.position} {characterController.OldPosition}");
 
             _boardPositions[oldBoardPos.Item2][oldBoardPos.Item1].Occuped = false;
         }
@@ -289,6 +302,13 @@ public class BoardController : MonoBehaviour
         ClearOldPosition(characterMovementController, characterMovementController.OldPosition);
         _characterControllers.Remove(characterMovementController);
         Destroy(characterMovementController.gameObject);
+    }
+
+    private void TriggerBoardUpdate()
+    {
+        var characters = _characterControllers.Select(c => c.CharacterRuntime.CharacterData).Distinct().ToList();
+
+        OnCharacterChangeInBoard?.Invoke(characters);
     }
 
 

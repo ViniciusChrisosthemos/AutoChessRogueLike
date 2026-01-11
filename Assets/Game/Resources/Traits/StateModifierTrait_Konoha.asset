@@ -12,5 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d3cfc003f430944bb7619910b9f549, type: 3}
   m_Name: StateModifierTrait_Konoha
   m_EditorClassIdentifier: 
+  _name: Konoha
   _description: I'm accepting traits ideas!
-  _levels: []
+  _icon: {fileID: 21300000, guid: fed2c922111f81d41a16af79e5132d83, type: 3}
+  _levels:
+  - {fileID: 11400000, guid: 6bccc56a617a5d94aa5bddfe17698d9e, type: 2}
+  - {fileID: 11400000, guid: 24c32146a7b576441a679bd3b330beb4, type: 2}
+  - {fileID: 11400000, guid: a99fd13dd86a2a443bb4678a2940af6d, type: 2}

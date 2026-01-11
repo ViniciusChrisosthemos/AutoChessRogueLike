@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private MeshRenderer _meshRenderer;
+    [SerializeField] private Transform _modelParent;
+    [SerializeField] private GameObject _defaultModel;
 
     [Header("UI")]
     [SerializeField] private GameObject _1starView;
@@ -90,6 +92,16 @@ public class CharacterMovementController : MonoBehaviour, IPointerDownHandler, I
         _meshRenderer.materials[0].color = _characterRuntime.CharacterData.Color;
 
         _characterRuntime.OnLevelUp.AddListener(UpdateStars);
+
+
+        if (characterSO.Model != null)
+        {
+            var modelInstance = Instantiate(characterSO.Model, _modelParent);
+            modelInstance.transform.localPosition = Vector3.zero;
+            modelInstance.transform.localRotation = Quaternion.identity;
+
+            Destroy(_defaultModel);
+        }
 
         UpdateStars();
     }

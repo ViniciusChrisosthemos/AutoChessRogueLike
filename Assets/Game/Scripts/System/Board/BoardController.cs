@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 public class BoardController : MonoBehaviour
 {
@@ -17,8 +18,6 @@ public class BoardController : MonoBehaviour
 
     public Transform CharacterParent;
     public CharacterMovementController CharacterControllerPrefab;
-
-    public UnityEvent<List<CharacterSO>> OnCharacterChangeInBoard;
 
     private void Start()
     {
@@ -138,6 +137,7 @@ public class BoardController : MonoBehaviour
     {
         //Debug.Log($"{characterController.CharacterRuntime.InBench}  {newPosition}");
 
+        var hasChanged = false;
         var newBoardPos = GetBoardPosition(newPosition);
 
         if (newBoardPos != (-1, -1))
@@ -150,17 +150,16 @@ public class BoardController : MonoBehaviour
                 ClearOldPosition(characterController, characterController.OldPosition);
 
                 characterController.SetPosition(_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position);
-
-                if (characterController.CharacterRuntime.InBench)
-                {
-                    TriggerBoardUpdate();
-                }
-
-                characterController.CharacterRuntime.InBench = false;
             }
             else
             {
                 characterController.SetPosition(characterController.OldPosition);
+            }
+
+            if (characterController.CharacterRuntime.InBench)
+            {
+                characterController.CharacterRuntime.InBench = false;
+                hasChanged = true;
             }
         }
         else
@@ -179,23 +178,28 @@ public class BoardController : MonoBehaviour
 
                     characterController.SetPosition(_benchPositions[newBenchPos.Item2][newBenchPos.Item1].Position);
 
-                    if (!characterController.CharacterRuntime.InBench)
-                    {
-                        TriggerBoardUpdate();
-                    }
-
-                    characterController.CharacterRuntime.InBench = true;
-
                 }
                 else
                 {
                     characterController.SetPosition(characterController.OldPosition);
+                }
+
+
+                if (!characterController.CharacterRuntime.InBench)
+                {
+                    characterController.CharacterRuntime.InBench = true;
+                    hasChanged = true;
                 }
             }
             else
             {
                 characterController.SetPosition(characterController.OldPosition);
             }
+        }
+
+        if (hasChanged)
+        {
+            TriggerBoardUpdate();
         }
     }
 
@@ -306,9 +310,19 @@ public class BoardController : MonoBehaviour
 
     private void TriggerBoardUpdate()
     {
-        var characters = _characterControllers.Select(c => c.CharacterRuntime.CharacterData).Distinct().ToList();
+        Debug.Log("Trigger Board Update");
 
-        OnCharacterChangeInBoard?.Invoke(characters);
+        foreach (var c in _characterControllers)
+        {
+                       Debug.Log($" - Character  {c.CharacterRuntime.CharacterData.name}   InBench: {c.CharacterRuntime.InBench}");
+        }
+
+        var characters = _characterControllers.Select(c => c.CharacterRuntime.CharacterData).Distinct().ToList();
+        var charactersInBoard = _characterControllers.Where(c => !c.CharacterRuntime.InBench).Select(c => c.CharacterRuntime.CharacterData).ToList();
+
+        Debug.Log($"Trigger Board Update {charactersInBoard.Count}");
+
+        GameStateController.Instance.UpdateTrais(charactersInBoard);
     }
 
 

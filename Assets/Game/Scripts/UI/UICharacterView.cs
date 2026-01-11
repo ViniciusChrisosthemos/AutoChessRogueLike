@@ -10,6 +10,7 @@ public class UICharacterView : UIItemController
     [SerializeField] private GameObject _view;
     [SerializeField] private Button _btnButton;
     [SerializeField] private Image _imgCharacter;
+    [SerializeField] private Image _imgCharacterBackground;
     [SerializeField] private UIListDisplay _keywordsListDisplay;
     [SerializeField] private TextMeshProUGUI _txtCost;
     [SerializeField] private TextMeshProUGUI _txtName;
@@ -18,6 +19,7 @@ public class UICharacterView : UIItemController
     {
         CharacterSO characterSO = obj as CharacterSO;
 
+        _imgCharacterBackground.color = characterSO.Color;
         _imgCharacter.sprite = characterSO.GetArt(CharacterSO.CharacterArtType.ShopArt);
 
         _keywordsListDisplay.SetItems(characterSO.Keywords, null);

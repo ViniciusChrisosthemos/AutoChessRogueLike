@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Keyword_Sharingan
   m_EditorClassIdentifier: 
   Name: Sharingan
-  Art: {fileID: 0}
+  Art: {fileID: 21300000, guid: dfac7d5cc003e5e469b823a017d82e7a, type: 3}
+  Trait: {fileID: 11400000, guid: d031a779f1297884da581f95ffae6026, type: 2}

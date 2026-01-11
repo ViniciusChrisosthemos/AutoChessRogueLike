@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07d137f4a32f8984396a250323c4bc31, type: 3}
-  m_Name: Keyword_Team8
+  m_Name: Keyword_TeamGai
   m_EditorClassIdentifier: 
-  Name: Team 8
-  Art: {fileID: 0}
+  Name: Team Gai
+  Art: {fileID: 21300000, guid: db25f7696e7f5d746930a210884f16cd, type: 3}
+  Trait: {fileID: 11400000, guid: 9b11b33d11a468e45bd9e6f3aad59638, type: 2}

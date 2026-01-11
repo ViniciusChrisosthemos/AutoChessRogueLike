@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d3cfc003f430944bb7619910b9f549, type: 3}
   m_Name: StateModifierTrait_Team7
   m_EditorClassIdentifier: 
+  _name: Team 7
   _description: What can I do here?
+  _icon: {fileID: 21300000, guid: ef64f996f392ddc49a6fd5b661933997, type: 3}
   _levels:
   - {fileID: 11400000, guid: 21165a9ebc1277442b198cb627afa522, type: 2}
   - {fileID: 11400000, guid: 0ba4d7ad647d5c24fa4eb5bfab1411b9, type: 2}

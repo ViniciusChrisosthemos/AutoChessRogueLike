@@ -13,6 +13,7 @@ public class CharacterSO : ScriptableObject
     public CostSO Cost;
     public List<KeywordSO> Keywords;
     public Color Color;
+    public GameObject Model;
 
     // Art
     public Sprite ShopArt;

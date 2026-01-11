@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Keyword_Konoha
   m_EditorClassIdentifier: 
   Name: Konoha
-  Art: {fileID: 0}
+  Art: {fileID: 21300000, guid: fed2c922111f81d41a16af79e5132d83, type: 3}
   Trait: {fileID: 11400000, guid: 3b3684004ea16e8419e7a6e143daa5e6, type: 2}

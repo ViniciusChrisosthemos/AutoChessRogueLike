@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07d137f4a32f8984396a250323c4bc31, type: 3}
-  m_Name: Keyword_Ino-Shika-Cho
+  m_Name: Keyword_Team10
   m_EditorClassIdentifier: 
-  Name: Ino-Shika-Cho
-  Art: {fileID: 0}
+  Name: Team 10
+  Art: {fileID: 21300000, guid: 30ee0b1a8d8d8d84b8222c1775b4b890, type: 3}
+  Trait: {fileID: 11400000, guid: 2e5454a050597c540a3c6d1115055dfe, type: 2}

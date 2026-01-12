@@ -9,6 +9,6 @@ public class UIProbabilityView : UIItemController
     {
         var probData = obj as ProbabilityHolder<CostSO>;
 
-        _txtProbability.text = $"{probData.Item.Cost} - {(probData.Probability*100):F0}%";
+        _txtProbability.text = $"{probData.Item.Cost}\n{(probData.Probability*100):F0}%";
     }
 }

@@ -15,25 +15,37 @@ public class UICharacterView : UIItemController
     [SerializeField] private TextMeshProUGUI _txtCost;
     [SerializeField] private TextMeshProUGUI _txtName;
 
+    private CharacterSO _characterSO;
+
     protected override void HandleInit(object obj)
     {
-        CharacterSO characterSO = obj as CharacterSO;
+        _characterSO = obj as CharacterSO;
 
-        _imgCharacterBackground.color = characterSO.Color;
-        _imgCharacter.sprite = characterSO.GetArt(CharacterSO.CharacterArtType.ShopArt);
+        _imgCharacterBackground.color = _characterSO.Color;
+        _imgCharacter.sprite = _characterSO.GetArt(CharacterSO.CharacterArtType.ShopArt);
 
-        _keywordsListDisplay.SetItems(characterSO.Keywords, null);
+        _keywordsListDisplay.SetItems(_characterSO.Keywords, null);
 
-        _txtName.text = characterSO.CharacterName;
-        _txtCost.text = characterSO.Cost.Cost.ToString();
+        _txtName.text = _characterSO.CharacterName;
+        _txtCost.text = _characterSO.Cost.Cost.ToString();
 
         _btnButton.onClick.AddListener(() => SelectItem());
 
         _view.SetActive(true);
     }
 
-    public void Hiden()
+    public void Hidden()
     {
         _view.SetActive(false);
+    }
+
+    public CharacterSO GetCharacterSO()
+    {
+        return _characterSO;
+    }
+
+    public void SetAvailable(bool isAvailable)
+    {
+        _imgCharacter.color = isAvailable ? Color.white : Color.gray;
     }
 }

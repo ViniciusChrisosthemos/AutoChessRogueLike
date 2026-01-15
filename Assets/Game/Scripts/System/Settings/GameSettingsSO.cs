@@ -7,5 +7,6 @@ public class GameSettingsSO : ScriptableObject
 
     [Header("Shop")]
     public int ShopRefreshCost = 2;
-    public int UpgradeCost = 4;
+    public int ExperienceCost = 4;
+    public int ExperienceValue = 4;
 }

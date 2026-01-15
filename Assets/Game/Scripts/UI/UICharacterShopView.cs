@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,7 +10,6 @@ using UnityEngine.UI;
 
 public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private BoardController _boardController;
     [SerializeField] private CharacterShopController _characterShopController;
     [SerializeField] private UIListDisplay _characterListDisplay;
     [SerializeField] private UIListDisplay _characterProbabilitiesListDisplay;
@@ -17,6 +17,9 @@ public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointer
     [SerializeField] private Button _btnUpgrade;
     [SerializeField] private GameObject _toDeleteView;
     [SerializeField] private TextMeshProUGUI _txtGold;
+    [SerializeField] private Slider _sliderExperienceBar;
+    [SerializeField] private TextMeshProUGUI _txtExperienceLabel;
+    [SerializeField] private TextMeshProUGUI _txtCharactersInBoard;
 
     private void Start()
     {
@@ -26,8 +29,14 @@ public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointer
         RefreshShop();
 
         GameStateController.Instance.OnDeleteCharacterRequest.AddListener(HandleDeleteCharacterRequest);
+        GameStateController.Instance.OnCharactersInBoardChanged.AddListener(HandleCharactersInBoardChanged);
 
         _characterProbabilitiesListDisplay.SetItems(_characterShopController.GetProbabilities(), null);
+    }
+
+    private void HandleCharactersInBoardChanged(int currentCharactersInBoard, int maxCharactersInBoard)
+    {
+        _txtCharactersInBoard.text = $"{currentCharactersInBoard} / {maxCharactersInBoard}";
     }
 
     private void Update()
@@ -38,7 +47,7 @@ public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointer
         }
 
 
-        if (Keyboard.current.eKey.wasPressedThisFrame && GameStateController.Instance.CanBuyUpgrade())
+        if (Keyboard.current.eKey.wasPressedThisFrame && GameStateController.Instance.CanBuyExperience())
         {
             BuyExp();
         }
@@ -66,34 +75,32 @@ public class UICharacterShopView : MonoBehaviour, IPointerEnterHandler, IPointer
 
     private void UpdateShopUI()
     {
-        var gameState = GameStateController.Instance.GameState;
 
-        _txtGold.text = gameState.Gold.ToString();
+        var gameStateController = GameStateController.Instance;
 
-        _btnUpgrade.interactable = _characterShopController.CanUpgradeShop();
+        _txtGold.text = gameStateController.GameState.Gold.ToString();
+
+        _btnUpgrade.interactable = _characterShopController.CanBuyExperienceShop();
         _btnRefreshShop.interactable = _characterShopController.CanRefreshShop();
+
+        _sliderExperienceBar.value = gameStateController.GetLevelProgress();
+        _txtExperienceLabel.text = gameStateController.IsMaxLevel() ? "MAX" : $"{gameStateController.GetCurrentExperience()} / {gameStateController.GetExperienceToNextLevel()}";
 
         UpdateCharacterAvailability();
     }
 
     private void HandleCharacterSelected(UIItemController controller)
     {
-        var gameState = GameStateController.Instance.GameState;
+        var characterSO = controller.GetItem<CharacterSO>();
 
-        if (!_boardController.IsBenchFull())
+        if (_characterShopController.CanBuyCharacter(characterSO))
         {
-            var characterSO = controller.GetItem<CharacterSO>();
+            _characterShopController.BuyCharacter(characterSO);
 
-            if (gameState.CanBuyCharacter(characterSO))
-            {
-                gameState.BuyCharacter(characterSO);
-                _boardController.CreateCharacter(characterSO);
+            var characterViewController = controller as UICharacterView;
+            characterViewController.Hidden();
 
-                var characterViewController = controller as UICharacterView;
-                characterViewController.Hidden();
-
-                UpdateShopUI();
-            }
+            UpdateShopUI();
         }
     }
 

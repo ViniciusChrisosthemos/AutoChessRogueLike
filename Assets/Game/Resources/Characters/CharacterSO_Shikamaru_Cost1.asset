@@ -19,4 +19,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 554ada9016dced34ca6c820642ee7e55, type: 2}
   Color: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 1}
   Model: {fileID: 1595349673434553696, guid: 05d4856684d891041ad3cfe6a68e1a14, type: 3}
-  ShopArt: {fileID: 1731631105, guid: 7cb76edf86a4c0045b86b383dcefa343, type: 3}
+  ShopArt: {fileID: 0}

@@ -6,10 +6,16 @@ using UnityEngine.Events;
 
 public class GameStateController : Singleton<GameStateController>
 {
-    public GameSettingsSO _gameSettingsSO;
+    [Header("Data")]
+    [SerializeField] private GameSettingsSO _gameSettingsSO;
 
+    [Header("References")]
+    [SerializeField] private BoardManager _boardManager;
+
+    [Header("Events")]
     public UnityEvent<bool> OnDeleteCharacterRequest;
     public UnityEvent<TraitsController> OnTraitsUpdated;
+    public UnityEvent<int, int> OnCharactersInBoardChanged;
 
     private GameState _gameState;
     private TraitsController _traitControllers;
@@ -18,6 +24,19 @@ public class GameStateController : Singleton<GameStateController>
     {
         _gameState = new GameState(_gameSettingsSO);
         _traitControllers = new TraitsController();
+        
+        _boardManager.OnBoardLevelUp.AddListener(TriggerCharactersInBoardChanged);
+        _boardManager.OnBoardUpdated.AddListener(TriggerCharactersInBoardChanged);
+    }
+
+    private void Start()
+    {
+        TriggerCharactersInBoardChanged();
+    }
+
+    private void TriggerCharactersInBoardChanged()
+    {
+        OnCharactersInBoardChanged?.Invoke(_boardManager.GetCharactersInBoardAmount(), _boardManager.GetMaxCharactersInBoardAmount());
     }
 
     public void UpdateTrais(List<CharacterSO> characters)
@@ -43,10 +62,17 @@ public class GameStateController : Singleton<GameStateController>
         _gameState.RmvGold(cost);
     }
 
-    public void BuyUpgrade()
+    public void BuyExperience()
     {
-        int cost = _gameState.GetUpgradeCost();
+        int cost = _gameState.GetExperienceCost();
         _gameState.RmvGold(cost);
+
+        AddExperience(_gameState.GetExperienceValue());
+    }
+
+    public void AddExperience(int exp)
+    {
+        _boardManager.AddExperience(exp);
     }
 
     public bool CanBuyShopRefresh()
@@ -54,9 +80,62 @@ public class GameStateController : Singleton<GameStateController>
         return _gameState.Gold >= _gameState.GetRefreshShopCost();
     }
 
-    public bool CanBuyUpgrade()
+    public bool CanBuyExperience()
     {
-        return _gameState.Gold >= _gameState.GetUpgradeCost();
+        var hasGold = _gameState.Gold >= _gameState.GetExperienceCost();
+        var isNotMaxLevel = !_boardManager.IsMaxLevel();
+
+        return hasGold && isNotMaxLevel;
+    }
+
+    public bool IsBoardFull()
+    {
+        return _boardManager.IsBoardFull();
+    }
+
+    public bool IsBenchFull()
+    {
+        return _boardManager.IsBenchFull();
+    }
+
+    public bool CanBuyCharacter(CharacterSO characterSO)
+    {
+        var hasGold = _gameState.CanBuyCharacter(characterSO);
+        var hasSpace = !IsBenchFull();
+
+        return hasGold && hasSpace;
+    }
+
+    public void BuyCharacter(CharacterSO characterSO)
+    {
+        _gameState.BuyCharacter(characterSO);
+
+        _boardManager.AddCharacter(characterSO);
+    }
+
+    public int GetCurrentLevel()
+    {
+        return _boardManager.GetCurrentLevel();
+    }
+
+    public int GetCurrentExperience()
+    {
+        return _boardManager.GetCurrentExperience();
+    }
+
+    public int GetExperienceToNextLevel()
+    {
+        return _boardManager.GetExperienceToNextLevel();
+    }
+
+    public float GetLevelProgress()
+    {
+        return _boardManager.GetLevelProgress();
+    }
+
+    public bool IsMaxLevel()
+    {
+        return _boardManager.IsMaxLevel();
     }
 
     public bool IsMouseInShopArea { get; set; }

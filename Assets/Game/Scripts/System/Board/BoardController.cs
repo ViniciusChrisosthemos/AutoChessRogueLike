@@ -6,54 +6,55 @@ using UnityEngine.Rendering;
 
 public class BoardController : MonoBehaviour
 {
-    public BoardConfigurationSO BoardConfiguration;
+
+    [Header("References")]
     public Transform BoardParent;
     public Transform BenchParent;
+    public GameObject CellPrefab;
+    public Transform CharacterParent;
+    public CharacterMovementController CharacterControllerPrefab;
+
+    [Header("Events")]
+    public UnityEvent OnBoardUpdated;
 
     private List<CharacterMovementController> _characterControllers;
     private ReferencePosition[][] _boardPositions;
     private ReferencePosition[][] _benchPositions;
 
-    public GameObject CellPrefab;
+    private BoardConfigurationSO _boardConfiguration;
+    private int _maxCharactersOnBoard = 0;
 
-    public Transform CharacterParent;
-    public CharacterMovementController CharacterControllerPrefab;
-
-    private void Start()
+    public void InitBoard(BoardConfigurationSO boardConfigurationSO)
     {
-        var rows = BoardConfiguration.BoardRows;
-        var columns = BoardConfiguration.BoardColumns;
+        _boardConfiguration = boardConfigurationSO;
+
+        var rows = boardConfigurationSO.BoardRows;
+        var columns = boardConfigurationSO.BoardColumns;
 
         _characterControllers = new List<CharacterMovementController>();
-
-        InitBoard(rows, columns);
-    }
-
-    private void InitBoard(int rows, int colums)
-    {
         _boardPositions = new ReferencePosition[rows][];
 
         for (int i = 0; i < rows; i++)
         {
-            _boardPositions[i] = new ReferencePosition[colums];
+            _boardPositions[i] = new ReferencePosition[columns];
         }
 
         var offset = new Vector3(
-            BoardConfiguration.CellSizeX / 2,
+            _boardConfiguration.CellSizeX / 2,
             0,
-            BoardConfiguration.CellSizeZ / 2
+            _boardConfiguration.CellSizeZ / 2
         );
 
         for (int y= 0; y < rows; y++)
         {
-            for (int x = 0; x < colums; x++)
+            for (int x = 0; x < columns; x++)
             {
                 var cell = CreateCell(x, y,
-                    BoardConfiguration.CellSpacingX,
-                    BoardConfiguration.CellSpacingY,
-                    BoardConfiguration.CellSizeX,
+                    _boardConfiguration.CellSpacingX,
+                    _boardConfiguration.CellSpacingY,
+                    _boardConfiguration.CellSizeX,
                     0.1f,
-                    BoardConfiguration.CellSizeZ,
+                    _boardConfiguration.CellSizeZ,
                     offset,
                     BoardParent);
 
@@ -63,8 +64,8 @@ public class BoardController : MonoBehaviour
             }
         }
 
-        var benchRows = BoardConfiguration.BenchRows;
-        var benchColumns = BoardConfiguration.BenchColumns;
+        var benchRows = _boardConfiguration.BenchRows;
+        var benchColumns = _boardConfiguration.BenchColumns;
 
         _benchPositions = new ReferencePosition[benchRows][];
 
@@ -74,11 +75,11 @@ public class BoardController : MonoBehaviour
             for (int x = 0; x < benchColumns; x++)
             {
                 var cell = CreateCell(x, y,
-                    BoardConfiguration.CellSpacingX,
-                    BoardConfiguration.CellSpacingY,
-                    BoardConfiguration.CellSizeX,
+                    _boardConfiguration.CellSpacingX,
+                    _boardConfiguration.CellSpacingY,
+                    _boardConfiguration.CellSizeX,
                     0.1f,
-                    BoardConfiguration.CellSizeZ,
+                    _boardConfiguration.CellSizeZ,
                     offset,
                     BenchParent);
 
@@ -107,8 +108,8 @@ public class BoardController : MonoBehaviour
         var rows = grid.Length;
         var columns = grid[0].Length;
 
-        var width = (BoardConfiguration.CellSizeX * columns + BoardConfiguration.CellSpacingX * (columns - 1));
-        var height = (BoardConfiguration.CellSizeZ * rows + BoardConfiguration.CellSpacingY * (rows - 1));
+        var width = (_boardConfiguration.CellSizeX * columns + _boardConfiguration.CellSpacingX * (columns - 1));
+        var height = (_boardConfiguration.CellSizeZ * rows + _boardConfiguration.CellSpacingY * (rows - 1));
 
         var x = Mathf.FloorToInt(columns * ((position.x - parent.position.x) / width));
         var y = Mathf.FloorToInt(rows * ((position.z - parent.position.z) / height));
@@ -145,21 +146,31 @@ public class BoardController : MonoBehaviour
             //Debug.Log($"New Board Pos   {newBoardPos}");
             if (!_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped)
             {
-                _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped = true;
+                Debug.Log("Move Character");
 
-                ClearOldPosition(characterController, characterController.OldPosition);
+                Debug.Log($"    {CharactersOnBoard.Count}  {IsBoardFull()} ");
+                if (characterController.CharacterRuntime.InBench && IsBoardFull())
+                {
+                    characterController.SetPosition(characterController.OldPosition);
+                }
+                else
+                {
+                    _boardPositions[newBoardPos.Item2][newBoardPos.Item1].Occuped = true;
 
-                characterController.SetPosition(_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position);
+                    ClearOldPosition(characterController, characterController.OldPosition);
+
+                    characterController.SetPosition(_boardPositions[newBoardPos.Item2][newBoardPos.Item1].Position);
+
+                    if (characterController.CharacterRuntime.InBench)
+                    {
+                        characterController.CharacterRuntime.InBench = false;
+                        hasChanged = true;
+                    }
+                }
             }
             else
             {
                 characterController.SetPosition(characterController.OldPosition);
-            }
-
-            if (characterController.CharacterRuntime.InBench)
-            {
-                characterController.CharacterRuntime.InBench = false;
-                hasChanged = true;
             }
         }
         else
@@ -272,6 +283,8 @@ public class BoardController : MonoBehaviour
         if (hasUpgraded)
         {
             CheckCharacterCopies(characterSO);
+
+            OnBoardUpdated?.Invoke();
         }
     }
 
@@ -286,6 +299,11 @@ public class BoardController : MonoBehaviour
         }
 
         return true;
+    }
+
+    public bool IsBoardFull()
+    {
+        return CharactersOnBoard.Count >= _maxCharactersOnBoard;
     }
 
     public (int, int) GetAvailableBenchPosition()
@@ -323,8 +341,16 @@ public class BoardController : MonoBehaviour
         Debug.Log($"Trigger Board Update {charactersInBoard.Count}");
 
         GameStateController.Instance.UpdateTrais(charactersInBoard);
+
+        OnBoardUpdated?.Invoke();
     }
 
+    public void SetMaxCharactersInBoard(int maxCharactersInBoard)
+    {
+        _maxCharactersOnBoard = maxCharactersInBoard;
+    }
+
+    public List<CharacterMovementController> CharactersOnBoard => _characterControllers.Where(c => !c.CharacterRuntime.InBench).ToList();
 
     public class ReferencePosition
     {

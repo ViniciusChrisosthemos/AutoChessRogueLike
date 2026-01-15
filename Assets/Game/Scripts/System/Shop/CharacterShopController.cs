@@ -37,11 +37,11 @@ public class CharacterShopController : MonoBehaviour
         return gameState.Gold >= gameState.GetRefreshShopCost();
     }
 
-    public bool CanUpgradeShop()
+    public bool CanBuyExperienceShop()
     {
         var gameState = GameStateController.Instance.GameState;
         
-        return gameState.Gold >= gameState.GetUpgradeCost();
+        return gameState.Gold >= gameState.GetExperienceCost();
     }
 
     public List<ProbabilityHolder<CostSO>> GetProbabilities()
@@ -51,9 +51,16 @@ public class CharacterShopController : MonoBehaviour
 
     public void BuyExperience()
     {
-        var gameState = GameStateController.Instance.GameState;
+        GameStateController.Instance.BuyExperience();
+    }
 
-        int cost = gameState.GetUpgradeCost();
-        gameState.RmvGold(cost);
+    public bool CanBuyCharacter(CharacterSO characterSO)
+    {
+        return GameStateController.Instance.CanBuyCharacter(characterSO);
+    }
+
+    public void BuyCharacter(CharacterSO characterSO)
+    {
+        GameStateController.Instance.BuyCharacter(characterSO);
     }
 }

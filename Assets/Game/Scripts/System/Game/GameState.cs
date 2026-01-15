@@ -29,9 +29,14 @@ public class GameState
         return _gameSettings.ShopRefreshCost;
     }
 
-    public int GetUpgradeCost()
+    public int GetExperienceCost()
     {
-        return _gameSettings.UpgradeCost;
+        return _gameSettings.ExperienceCost;
+    }
+
+    public int GetExperienceValue()
+    {
+        return _gameSettings.ExperienceValue;
     }
 
     public bool CanBuyCharacter(CharacterSO characterSO)

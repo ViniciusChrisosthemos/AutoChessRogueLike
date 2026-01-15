@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d58f9438ea4f9345819125b2ad2af6f, type: 3}
+  m_Name: BoardLevelProgression_Default
+  m_EditorClassIdentifier: 
+  _levelsData:
+  - _cost: 2
+    _maxCharactersAmount: 1
+  - _cost: 4
+    _maxCharactersAmount: 2
+  - _cost: 6
+    _maxCharactersAmount: 3
+  - _cost: 10
+    _maxCharactersAmount: 4
+  - _cost: 20
+    _maxCharactersAmount: 5
+  - _cost: 36
+    _maxCharactersAmount: 6
+  - _cost: 48
+    _maxCharactersAmount: 7
+  - _cost: 72
+    _maxCharactersAmount: 8
+  - _cost: 84
+    _maxCharactersAmount: 9
+  - _cost: 100
+    _maxCharactersAmount: 10
